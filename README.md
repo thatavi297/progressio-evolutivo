@@ -489,9 +489,9 @@ npx tsc --noEmit
 
 O comando é utilizado para verificar o TypeScript sem gerar arquivos. O backend também deve permanecer executando normalmente pelo comando `npm run dev`.
 
-## 22. Performance — evidências da N1
+## 22. Performance
 
-A performance do Progressio será avaliada pelo painel **Chrome DevTools → Network → Fetch/XHR → Timing**, observando requisições à API Fastify, como **GET `/treinos`**.
+A performance do Progressio ser foi avaliada pelo painel **Chrome DevTools → Network → Fetch/XHR → Timing**, observando requisições à API Fastify, como **GET `/treinos`**.
 
 ### Primeira medição
 
@@ -532,8 +532,6 @@ A performance do Progressio será avaliada pelo painel **Chrome DevTools → Net
 - Request sent: 0,18 ms
 - Waiting for server response: 1,72 ms
 - Content download: 0,60 ms
-
-**Espaço para o print da segunda medição:**
 
 ![Resposta 2](images/resposta-2.png)
 
