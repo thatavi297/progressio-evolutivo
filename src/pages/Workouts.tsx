@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useState,
-} from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   CalendarDays,
@@ -14,446 +11,258 @@ import {
 } from 'lucide-react'
 
 import { useNavigate } from 'react-router-dom'
-
-import type {
-  Workout,
-  WorkoutExercise,
-} from '../types/Workout'
-
+import type { Workout, WorkoutExercise } from '../types/Workout'
+import { registrarTreino } from '../services/workoutStorage'
 import {
-  buscarTreinos,
-  criarTreino,
-  excluirTreino,
-  registrarTreino,
-  renomearTreino,
-  salvarTreinos,
-} from '../services/workoutStorage'
+  listarTreinos,
+  cadastrarTreino,
+  atualizarTreino,
+  deletarTreino,
+} from '../services/treinosApi'
 
 function obterDataAtual() {
   const hoje = new Date()
-
-  const ano =
-    hoje.getFullYear()
-
-  const mes = String(
-    hoje.getMonth() + 1,
-  ).padStart(2, '0')
-
-  const dia = String(
-    hoje.getDate(),
-  ).padStart(2, '0')
-
+  const ano = hoje.getFullYear()
+  const mes = String(hoje.getMonth() + 1).padStart(2, '0')
+  const dia = String(hoje.getDate()).padStart(2, '0')
   return `${ano}-${mes}-${dia}`
 }
 
-function ehCardio(
-  exercicio: WorkoutExercise,
-) {
-  if (exercicio.tipo === 'cardio') {
-    return true
-  }
+function ehCardio(exercicio: WorkoutExercise) {
+  if (exercicio.tipo === 'cardio') return true
+  const categoria = exercicio.categoria?.toLowerCase().trim() ?? ''
+  return categoria.includes('cardio') || categoria.includes('cardiovascular')
+}
 
-  const categoria =
-    exercicio.categoria
-      ?.toLowerCase()
-      .trim() ?? ''
-
-  return (
-    categoria.includes('cardio') ||
-    categoria.includes(
-      'cardiovascular',
-    )
-  )
+function descreverErro(erro: unknown) {
+  return erro instanceof Error
+    ? erro.message
+    : 'Não foi possível concluir a operação. Confira a API.'
 }
 
 function Workouts() {
   const navigate = useNavigate()
-
-  const [treinos, setTreinos] =
-    useState<Workout[]>([])
-
-  const [
-    treinoSelecionadoId,
-    setTreinoSelecionadoId,
-  ] = useState('')
-
-  const [
-    novoTreino,
-    setNovoTreino,
-  ] = useState('')
-
-  const [
-    nomeTreino,
-    setNomeTreino,
-  ] = useState('')
-
-  const [
-    dataTreino,
-    setDataTreino,
-  ] = useState(obterDataAtual())
-
-  const [mensagem, setMensagem] =
-    useState('')
-
-  const [
-    tipoMensagem,
-    setTipoMensagem,
-  ] = useState<
-    'sucesso' | 'erro' | ''
-  >('')
+  const [treinos, setTreinos] = useState<Workout[]>([])
+  const [treinoSelecionadoId, setTreinoSelecionadoId] = useState('')
+  const [novoTreino, setNovoTreino] = useState('')
+  const [nomeTreino, setNomeTreino] = useState('')
+  const [dataTreino, setDataTreino] = useState(obterDataAtual())
+  const [mensagem, setMensagem] = useState('')
+  const [tipoMensagem, setTipoMensagem] = useState<'sucesso' | 'erro' | ''>('')
+  const [carregando, setCarregando] = useState(true)
+  const [erroApi, setErroApi] = useState('')
+  const [processando, setProcessando] = useState(false)
 
   useEffect(() => {
-    const dados =
-      buscarTreinos()
+    let ativo = true
 
-    setTreinos(dados)
-
-    if (dados.length > 0) {
-      setTreinoSelecionadoId(
-        dados[0].id,
-      )
-
-      setNomeTreino(
-        dados[0].nome,
-      )
+    async function carregar() {
+      try {
+        setCarregando(true)
+        setErroApi('')
+        const dados = await listarTreinos()
+        if (!ativo) return
+        setTreinos(dados)
+        if (dados.length > 0) {
+          setTreinoSelecionadoId(dados[0].id)
+          setNomeTreino(dados[0].nome)
+        } else {
+          setTreinoSelecionadoId('')
+          setNomeTreino('')
+        }
+      } catch (erro) {
+        if (ativo) setErroApi(descreverErro(erro))
+      } finally {
+        if (ativo) setCarregando(false)
+      }
     }
+
+    void carregar()
+    return () => { ativo = false }
   }, [])
 
   const treinoSelecionado =
-    treinos.find(
-      (treino) =>
-        treino.id ===
-        treinoSelecionadoId,
-    ) ?? null
+    treinos.find((treino) => treino.id === treinoSelecionadoId) ?? null
 
-  function selecionarTreino(
-    treino: Workout,
-  ) {
-    setTreinoSelecionadoId(
-      treino.id,
-    )
-
-    setNomeTreino(
-      treino.nome,
-    )
-
+  function selecionarTreino(treino: Workout) {
+    if (processando) return
+    setTreinoSelecionadoId(treino.id)
+    setNomeTreino(treino.nome)
     setMensagem('')
   }
 
-  function adicionarNovoTreino() {
-    const nome =
-      novoTreino.trim()
+  async function executarOperacao(
+    operacao: () => Promise<void>,
+    sucesso: string,
+  ) {
+    if (processando) return
+    setProcessando(true)
+    setMensagem('')
+    try {
+      await operacao()
+      setTipoMensagem('sucesso')
+      setMensagem(sucesso)
+    } catch (erro) {
+      setTipoMensagem('erro')
+      setMensagem(descreverErro(erro))
+    } finally {
+      setProcessando(false)
+    }
+  }
 
+  function adicionarNovoTreino() {
+    const nome = novoTreino.trim()
     if (!nome) {
       setTipoMensagem('erro')
-
-      setMensagem(
-        'Digite um nome para o treino.',
-      )
-
+      setMensagem('Digite um nome para o treino.')
       return
     }
-
-    const jaExiste =
-      treinos.some(
-        (treino) =>
-          treino.nome
-            .toLowerCase() ===
-          nome.toLowerCase(),
-      )
-
-    if (jaExiste) {
+    if (treinos.some((treino) => treino.nome.toLowerCase() === nome.toLowerCase())) {
       setTipoMensagem('erro')
-
-      setMensagem(
-        'Já existe um treino com esse nome.',
-      )
-
+      setMensagem('Já existe um treino com esse nome.')
       return
     }
-
-    const criado =
-      criarTreino(nome)
-
-    const atualizados = [
-      ...treinos,
-      criado,
-    ]
-
-    setTreinos(atualizados)
-
-    setTreinoSelecionadoId(
-      criado.id,
-    )
-
-    setNomeTreino(
-      criado.nome,
-    )
-
-    setNovoTreino('')
-
-    setTipoMensagem('sucesso')
-
-    setMensagem(
-      'Novo treino criado com sucesso.',
-    )
+    void executarOperacao(async () => {
+      const criado = await cadastrarTreino({ nome, exercicios: [] })
+      setTreinos((anteriores) => [...anteriores, criado])
+      setTreinoSelecionadoId(criado.id)
+      setNomeTreino(criado.nome)
+      setNovoTreino('')
+    }, 'Novo treino criado com sucesso.')
   }
 
   function salvarNome() {
-    if (!treinoSelecionado) {
-      return
-    }
-
-    const nome =
-      nomeTreino.trim()
-
+    if (!treinoSelecionado) return
+    const nome = nomeTreino.trim()
     if (!nome) {
       setTipoMensagem('erro')
-
-      setMensagem(
-        'O treino precisa ter um nome.',
-      )
-
+      setMensagem('O treino precisa ter um nome.')
       return
     }
-
-    const atualizados =
-      renomearTreino(
-        treinoSelecionado.id,
+    if (treinos.some((treino) =>
+      treino.id !== treinoSelecionado.id && treino.nome.toLowerCase() === nome.toLowerCase()
+    )) {
+      setTipoMensagem('erro')
+      setMensagem('Já existe um treino com esse nome.')
+      return
+    }
+    void executarOperacao(async () => {
+      const atualizado = await atualizarTreino(treinoSelecionado.id, {
         nome,
-      )
-
-    setTreinos(atualizados)
-
-    setTipoMensagem('sucesso')
-
-    setMensagem(
-      'Nome do treino atualizado.',
-    )
+        exercicios: treinoSelecionado.exercicios,
+      })
+      setTreinos((anteriores) => anteriores.map((treino) =>
+        treino.id === atualizado.id ? atualizado : treino
+      ))
+      setNomeTreino(atualizado.nome)
+    }, 'Nome do treino atualizado.')
   }
 
   function removerTreinoAtual() {
-    if (!treinoSelecionado) {
+    if (!treinoSelecionado) return
+    if (treinos.length <= 1) {
+      setTipoMensagem('erro')
+      setMensagem('Você precisa manter pelo menos um treino.')
       return
     }
-
-    try {
-      const atualizados =
-        excluirTreino(
-          treinoSelecionado.id,
-        )
-
-      setTreinos(atualizados)
-
-      const primeiro =
-        atualizados[0]
-
-      setTreinoSelecionadoId(
-        primeiro.id,
-      )
-
-      setNomeTreino(
-        primeiro.nome,
-      )
-
-      setTipoMensagem('sucesso')
-
-      setMensagem(
-        'Treino excluído.',
-      )
-    } catch (error) {
-      setTipoMensagem('erro')
-
-      setMensagem(
-        error instanceof Error
-          ? error.message
-          : 'Não foi possível excluir o treino.',
-      )
-    }
+    void executarOperacao(async () => {
+      await deletarTreino(treinoSelecionado.id)
+      const restantes = treinos.filter((treino) => treino.id !== treinoSelecionado.id)
+      setTreinos(restantes)
+      setTreinoSelecionadoId(restantes[0].id)
+      setNomeTreino(restantes[0].nome)
+    }, 'Treino excluído.')
   }
 
   function alterarExercicio(
     exercicioId: number,
-    campo:
-      | 'series'
-      | 'repeticoes'
-      | 'carga'
-      | 'tempoMinutos',
+    campo: 'series' | 'repeticoes' | 'carga' | 'tempoMinutos',
     valor: number,
   ) {
-    setTreinos(
-      (estadoAtual) =>
-        estadoAtual.map(
-          (treino) => {
-            if (
-              treino.id !==
-              treinoSelecionadoId
-            ) {
-              return treino
-            }
-
-            return {
-              ...treino,
-
-              exercicios:
-                treino.exercicios.map(
-                  (exercicio) =>
-                    exercicio.id ===
-                    exercicioId
-                      ? {
-                          ...exercicio,
-                          [campo]:
-                            valor,
-                        }
-                      : exercicio,
-                ),
-            }
-          },
+    setTreinos((anteriores) => anteriores.map((treino) =>
+      treino.id !== treinoSelecionadoId ? treino : {
+        ...treino,
+        exercicios: treino.exercicios.map((exercicio) =>
+          exercicio.id === exercicioId ? { ...exercicio, [campo]: valor } : exercicio
         ),
-    )
-
+      }
+    ))
     setMensagem('')
   }
 
-  function removerExercicio(
-    exercicioId: number,
-  ) {
-    const atualizados =
-      treinos.map(
-        (treino) => {
-          if (
-            treino.id !==
-            treinoSelecionadoId
-          ) {
-            return treino
-          }
-
-          return {
-            ...treino,
-
-            exercicios:
-              treino.exercicios.filter(
-                (exercicio) =>
-                  exercicio.id !==
-                  exercicioId,
-              ),
-          }
-        },
-      )
-
-    setTreinos(atualizados)
-
-    salvarTreinos(atualizados)
-
-    setTipoMensagem('sucesso')
-
-    setMensagem(
-      'Exercício removido do treino.',
+  function removerExercicio(exercicioId: number) {
+    if (!treinoSelecionado) return
+    const exercicios = treinoSelecionado.exercicios.filter(
+      (exercicio) => exercicio.id !== exercicioId
     )
+    void executarOperacao(async () => {
+      const atualizado = await atualizarTreino(treinoSelecionado.id, {
+        nome: treinoSelecionado.nome,
+        exercicios,
+      })
+      setTreinos((anteriores) => anteriores.map((treino) =>
+        treino.id === atualizado.id ? atualizado : treino
+      ))
+    }, 'Exercício removido do treino.')
   }
 
   function validarTreino() {
-    if (!treinoSelecionado) {
-      return false
-    }
-
-    const invalido =
-      treinoSelecionado
-        .exercicios.some(
-          (exercicio) => {
-            if (ehCardio(exercicio)) {
-              return (
-                !exercicio.tempoMinutos ||
-                exercicio.tempoMinutos <= 0
-              )
-            }
-
-            return (
-              exercicio.series <= 0 ||
-              exercicio.repeticoes <= 0 ||
-              exercicio.carga < 0
-            )
-          },
-        )
-
+    if (!treinoSelecionado) return false
+    const invalido = treinoSelecionado.exercicios.some((exercicio) => {
+      if (ehCardio(exercicio)) {
+        return !exercicio.tempoMinutos || exercicio.tempoMinutos <= 0
+      }
+      return exercicio.series <= 0 || exercicio.repeticoes <= 0 || exercicio.carga < 0
+    })
     if (invalido) {
       setTipoMensagem('erro')
-
-      setMensagem(
-        'Confira os dados dos exercícios antes de continuar.',
-      )
-
+      setMensagem('Confira os dados dos exercícios antes de continuar.')
       return false
     }
-
     return true
   }
 
   function salvarAlteracoes() {
-    if (!validarTreino()) {
-      return
-    }
-
-    salvarTreinos(treinos)
-
-    setTipoMensagem('sucesso')
-
-    setMensagem(
-      'Alterações salvas com sucesso.',
-    )
+    if (!treinoSelecionado || !validarTreino()) return
+    void executarOperacao(async () => {
+      const atualizado = await atualizarTreino(treinoSelecionado.id, {
+        nome: treinoSelecionado.nome,
+        exercicios: treinoSelecionado.exercicios,
+      })
+      setTreinos((anteriores) => anteriores.map((treino) =>
+        treino.id === atualizado.id ? atualizado : treino
+      ))
+    }, 'Alterações salvas com sucesso.')
   }
 
   function registrar() {
-    if (!treinoSelecionado) {
-      return
-    }
-
-    if (
-      treinoSelecionado
-        .exercicios.length === 0
-    ) {
+    if (!treinoSelecionado) return
+    if (treinoSelecionado.exercicios.length === 0) {
       setTipoMensagem('erro')
-
-      setMensagem(
-        'Adicione exercícios antes de registrar o treino.',
-      )
-
+      setMensagem('Adicione exercícios antes de registrar o treino.')
       return
     }
-
     if (!dataTreino) {
       setTipoMensagem('erro')
-
-      setMensagem(
-        'Informe a data do treino.',
-      )
-
+      setMensagem('Informe a data do treino.')
       return
     }
+    if (!validarTreino()) return
 
-    if (!validarTreino()) {
-      return
-    }
-
-    salvarTreinos(treinos)
-
-    registrarTreino(
-      treinoSelecionado.exercicios,
-      dataTreino,
-      {
-        id:
-          treinoSelecionado.id,
-
-        nome:
-          treinoSelecionado.nome,
-      },
-    )
-
-    setTipoMensagem('sucesso')
-
-    setMensagem(
-      'Treino registrado! Seus dados foram adicionados ao histórico.',
-    )
+    void executarOperacao(async () => {
+      const atualizado = await atualizarTreino(treinoSelecionado.id, {
+        nome: treinoSelecionado.nome,
+        exercicios: treinoSelecionado.exercicios,
+      })
+      setTreinos((anteriores) => anteriores.map((treino) =>
+        treino.id === atualizado.id ? atualizado : treino
+      ))
+      // Histórico de progresso permanece no localStorage nesta etapa da N1.
+      registrarTreino(atualizado.exercicios, dataTreino, {
+        id: atualizado.id,
+        nome: atualizado.nome,
+      })
+    }, 'Treino registrado! Seus dados foram adicionados ao histórico.')
   }
 
   const totalSeries =
@@ -513,6 +322,24 @@ function Workouts() {
         </button>
       </section>
 
+      {carregando && (
+        <p role="status">Carregando fichas de treino...</p>
+      )}
+
+      {erroApi && (
+        <div className="workout-message workout-message-error" role="alert">
+          Erro ao carregar os treinos: {erroApi}. Verifique se o Fastify está ligado na porta 3333.
+        </div>
+      )}
+
+      {!carregando && !erroApi && treinos.length === 0 && (
+        <p>Nenhuma ficha de treino encontrada.</p>
+      )}
+
+      {processando && (
+        <p role="status">Salvando alterações...</p>
+      )}
+
       <section className="workout-manager">
         <div className="workout-tabs">
           {treinos.map(
@@ -525,6 +352,7 @@ function Workouts() {
                     ? 'workout-tab workout-tab-active'
                     : 'workout-tab'
                 }
+                disabled={processando}
                 onClick={() =>
                   selecionarTreino(
                     treino,
@@ -560,6 +388,7 @@ function Workouts() {
           />
 
           <button
+            disabled={carregando || processando || Boolean(erroApi)}
             onClick={
               adicionarNovoTreino
             }
@@ -591,6 +420,7 @@ function Workouts() {
                 />
 
                 <button
+                  disabled={processando}
                   onClick={
                     salvarNome
                   }
@@ -606,6 +436,7 @@ function Workouts() {
 
             <button
               className="delete-workout-button"
+              disabled={processando}
               onClick={
                 removerTreinoAtual
               }
@@ -850,8 +681,9 @@ function Workouts() {
                                     type="number"
                                     min="0"
                                     step="0.5"
+                                    placeholder="Ex: 55"
                                     value={
-                                      exercicio.carga
+                                      exercicio.carga === 0 ? '' : exercicio.carga
                                     }
                                     onChange={(
                                       event,

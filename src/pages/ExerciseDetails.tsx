@@ -22,9 +22,9 @@ import {
 } from '../services/exerciseApi'
 
 import {
-  adicionarAoTreino,
-  buscarTreinos,
-} from '../services/workoutStorage'
+  listarTreinos,
+  atualizarTreino,
+} from '../services/treinosApi'
 
 import type {
   Exercise,
@@ -55,6 +55,10 @@ function ExerciseDetails() {
 
   const [treinos, setTreinos] =
     useState<Workout[]>([])
+
+  const [carregandoTreinos, setCarregandoTreinos] = useState(true)
+  const [erroTreinos, setErroTreinos] = useState('')
+  const [adicionando, setAdicionando] = useState(false)
 
   const [
     treinoSelecionadoId,
@@ -130,16 +134,27 @@ function ExerciseDetails() {
   }, [id])
 
   useEffect(() => {
-    const dados =
-      buscarTreinos()
+    let ativo = true
 
-    setTreinos(dados)
-
-    if (dados.length > 0) {
-      setTreinoSelecionadoId(
-        dados[0].id,
-      )
+    async function carregarFichas() {
+      try {
+        setCarregandoTreinos(true)
+        setErroTreinos('')
+        const dados = await listarTreinos()
+        if (!ativo) return
+        setTreinos(dados)
+        setTreinoSelecionadoId(dados[0]?.id ?? '')
+      } catch (erro) {
+        if (ativo) setErroTreinos(
+          erro instanceof Error ? erro.message : 'Não foi possível carregar as fichas.'
+        )
+      } finally {
+        if (ativo) setCarregandoTreinos(false)
+      }
     }
+
+    void carregarFichas()
+    return () => { ativo = false }
   }, [])
 
   function obterTraducoes(
@@ -192,7 +207,7 @@ function ExerciseDetails() {
     )
   }
 
-  function adicionar() {
+  async function adicionar() {
     if (!exercicio) {
       return
     }
@@ -257,60 +272,40 @@ function ExerciseDetails() {
       ingles,
     } = obterTraducoes(exercicio)
 
+    const treino = treinos.find((item) => item.id === treinoSelecionadoId)
+    if (!treino) {
+      setTipoMensagem('erro')
+      setMensagem('Treino não encontrado. Atualize a página e tente novamente.')
+      return
+    }
+    if (treino.exercicios.some((item) => item.id === exercicio.id)) {
+      setTipoMensagem('erro')
+      setMensagem('Este exercício já está neste treino.')
+      return
+    }
+
+    setAdicionando(true)
     try {
-      adicionarAoTreino(
-        {
-          id: exercicio.id,
-
-          nome:
-            portugues?.name ??
-            ingles?.name ??
-            'Exercício',
-
-          categoria:
-            exercicio.category
-              ?.name ??
-            'Não informada',
-
-          equipamento:
-            exercicio.equipment
-              ?.map(
-                (item) =>
-                  item.name,
-              )
-              .join(', ') ||
-            'Sem equipamento',
-
-          tipo: cardio
-            ? 'cardio'
-            : 'musculacao',
-
-          series: cardio
-            ? 0
-            : series,
-
-          repeticoes: cardio
-            ? 0
-            : repeticoes,
-
-          carga: cardio
-            ? 0
-            : carga,
-
-          tempoMinutos: cardio
-            ? tempoMinutos
-            : undefined,
-        },
-
-        treinoSelecionadoId,
-      )
-
-      const treino =
-        treinos.find(
-          (item) =>
-            item.id ===
-            treinoSelecionadoId,
-        )
+      const atualizado = await atualizarTreino(treinoSelecionadoId, {
+        nome: treino.nome,
+        exercicios: [
+          ...treino.exercicios,
+          {
+            id: exercicio.id,
+            nome: portugues?.name ?? ingles?.name ?? 'Exercício',
+            categoria: exercicio.category?.name ?? 'Não informada',
+            equipamento: exercicio.equipment?.map((item) => item.name).join(', ') || 'Sem equipamento',
+            tipo: cardio ? 'cardio' : 'musculacao',
+            series: cardio ? 0 : series,
+            repeticoes: cardio ? 0 : repeticoes,
+            carga: cardio ? 0 : carga,
+            tempoMinutos: cardio ? tempoMinutos : undefined,
+          },
+        ],
+      })
+      setTreinos((anteriores) => anteriores.map((item) =>
+        item.id === atualizado.id ? atualizado : item
+      ))
 
       setTipoMensagem(
         'sucesso',
@@ -336,6 +331,8 @@ function ExerciseDetails() {
           'Não foi possível adicionar o exercício.',
         )
       }
+    } finally {
+      setAdicionando(false)
     }
   }
 
@@ -525,6 +522,16 @@ function ExerciseDetails() {
               : 'Escolha a ficha e informe séries, repetições e carga.'}
           </p>
 
+          {carregandoTreinos && <p role="status">Carregando fichas...</p>}
+          {erroTreinos && (
+            <p role="alert" style={{ color: '#dc2626' }}>
+              Erro ao buscar fichas: {erroTreinos}. Verifique se o backend está ativo.
+            </p>
+          )}
+          {!carregandoTreinos && !erroTreinos && treinos.length === 0 && (
+            <p>Nenhuma ficha disponível. Crie uma ficha em Minhas fichas.</p>
+          )}
+
           <div className="config-field">
             <label htmlFor="treino">
               Adicionar ao treino
@@ -533,6 +540,7 @@ function ExerciseDetails() {
             <select
               id="treino"
               className="workout-select"
+              disabled={carregandoTreinos || adicionando || Boolean(erroTreinos)}
               value={
                 treinoSelecionadoId
               }
@@ -654,7 +662,8 @@ function ExerciseDetails() {
                     type="number"
                     min="0"
                     step="0.5"
-                    value={carga}
+                    placeholder="Ex: 55"
+                    value={carga === 0 ? '' : carga}
                     onChange={(event) =>
                       setCarga(
                         Number(
@@ -705,6 +714,7 @@ function ExerciseDetails() {
 
           <button
             className="add-workout-button"
+            disabled={carregandoTreinos || adicionando || Boolean(erroTreinos) || treinos.length === 0}
             onClick={adicionar}
           >
             {cardio ? (
@@ -713,7 +723,7 @@ function ExerciseDetails() {
               <Dumbbell size={19} />
             )}
 
-            Adicionar ao treino
+            {adicionando ? 'Adicionando...' : 'Adicionar ao treino'}
           </button>
 
           {tipoMensagem ===

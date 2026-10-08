@@ -1,497 +1,361 @@
-# Progressio
+# Progressio — Sistema de gerenciamento de treinos e acompanhamento de evolução
 
-O **Progressio** é uma aplicação web desenvolvida para organização de treinos de academia e acompanhamento da evolução dos usuários.
+**Integrante:** Thainara de Fátima Jacob Vieira  
+**Disciplina:** Programação para Sistemas Web  
+**Semestre:** 2026.2  
+**Avaliação:** N1 — Projeto Evolutivo
 
-A proposta do sistema é permitir que o usuário monte diferentes fichas de treino, escolha exercícios, configure séries, repetições e cargas para exercícios de musculação ou tempo em minutos para exercícios de cardio, registrando sua evolução ao longo do tempo.
+## 1. Sobre o projeto
 
-O sistema também apresenta informações dos exercícios em **português e inglês**, utilizando as traduções disponíveis na API externa.
+O **Progressio** é uma aplicação web desenvolvida para facilitar a organização de treinos de academia e o acompanhamento da evolução dos usuários ao longo do tempo. A proposta é permitir que cada pessoa organize diferentes fichas de treino, escolha exercícios, configure suas informações e registre sessões para comparar seu desempenho.
 
-O projeto foi desenvolvido utilizando **React, TypeScript e Vite**, com organização em componentes, páginas, serviços e tipos.
+O sistema diferencia **exercícios de musculação**, acompanhados por séries, repetições e carga em quilogramas, de **exercícios de cardio**, acompanhados pelo tempo em minutos. Além de organizar fichas, apresenta histórico, indicadores e gráficos de progresso.
 
----
+O catálogo de exercícios é consultado na API pública **wger Workout Manager**, que fornece informações como categoria, equipamentos, nomes e descrições. Quando existem traduções disponíveis, os dados são apresentados em **português e inglês**.
 
-## Objetivo do projeto
+A aplicação utiliza **React, TypeScript e Vite** no frontend. Na versão da **N1**, foi incorporado um **backend próprio em Node.js e Fastify**, que permite listar, consultar, criar, alterar e excluir fichas de treino por meio de requisições HTTP. O CRUD funciona com **dados em memória**, sem banco de dados nesta etapa.
 
-O objetivo do Progressio é facilitar a organização dos treinos e permitir que o usuário acompanhe sua evolução de maneira simples.
+O Progressio possui identidade visual própria, com predominância de **azul-céu, branco e tons claros de cinza**, buscando uma interface simples, moderna e organizada.
 
-O sistema diferencia exercícios de musculação e cardio.
+## 2. Objetivo do projeto
 
-Nos exercícios de musculação, o acompanhamento é realizado através de séries, repetições e carga utilizada.
+O objetivo é tornar mais simples a criação de rotinas de treino e a visualização da evolução do usuário. Em vez de registrar as informações de maneira dispersa, o sistema reúne fichas, exercícios, sessões e indicadores em páginas conectadas.
 
-Nos exercícios de cardio, o acompanhamento é realizado através do tempo em minutos.
+- **Organizar fichas:** criar treinos diferentes, como Treino A, Treino B e Treino C.
+- **Personalizar exercícios:** informar séries, repetições e cargas para musculação ou duração para cardio.
+- **Registrar sessões:** associar exercícios realizados a uma data.
+- **Acompanhar o progresso:** comparar cargas e tempos de sessões anteriores com registros recentes.
+- **Integrar frontend e backend:** gerenciar as fichas por uma API própria, com CRUD HTTP funcional.
 
-Os registros são armazenados e utilizados para gerar históricos, indicadores e gráficos de evolução.
+## 3. Principais funcionalidades
 
----
+### Acesso e navegação
 
-## Principais funcionalidades
+- Login de demonstração e logout.
+- Controle do estado da autenticação pelo `localStorage` do navegador.
+- Proteção de rotas internas.
+- Menu de navegação entre as páginas.
+- Página personalizada para endereços inexistentes (erro 404).
 
-O sistema possui as seguintes funcionalidades:
+### Catálogo de exercícios
 
-- Login de demonstração
-- Controle de autenticação utilizando LocalStorage
-- Proteção de rotas
-- Dashboard com resumo das informações
-- Catálogo de exercícios
-- Consumo de API externa
-- Busca de exercícios pelo nome
-- Busca utilizando nomes em português e inglês
-- Filtro de exercícios por categoria
-- Exibição do nome dos exercícios em português e inglês
-- Exibição das descrições em português e inglês quando disponíveis
-- Página de detalhes de cada exercício
-- Diferenciação entre musculação e cardio
-- Exercícios de musculação com séries, repetições e carga
-- Exercícios de cardio com tempo em minutos
-- Criação de várias fichas de treino
-- Renomeação de fichas de treino
-- Exclusão de fichas
-- Adição de exercícios em diferentes fichas
-- Remoção de exercícios das fichas
-- Registro da data do treino
-- Histórico dos exercícios realizados
-- Evolução de carga para musculação
-- Evolução de tempo para cardio
-- Gráficos de progresso
-- Página específica de progresso
-- Página de erro 404
-- Menu de navegação
-- Layout responsivo para diferentes tamanhos de tela
+- Consulta à API pública wger.
+- Busca pelo nome do exercício, considerando traduções em português e inglês quando disponíveis.
+- Filtro por categoria.
+- Cards com informações dos exercícios.
+- Página de detalhes, com nomes, descrições, categoria e equipamentos quando fornecidos pela API.
+- Diferenciação entre musculação e cardio.
 
----
+### Fichas de treino
 
-## Tecnologias utilizadas
+- Listar fichas cadastradas.
+- Criar, selecionar, renomear e excluir fichas.
+- Adicionar exercícios a uma ficha e removê-los.
+- Editar séries, repetições, carga e tempo de cardio.
+- Salvar alterações pela API própria Fastify.
+- Visualizar quantidades de exercícios, total de séries e duração de cardio.
+- Manter ao menos uma ficha no sistema, conforme a validação da API.
 
-O projeto foi desenvolvido utilizando:
+### Registro e evolução
 
-- React
-- TypeScript
-- Vite
-- React Router DOM
-- Lucide React
-- Recharts
-- CSS
-- LocalStorage
-- Fetch API
+- Registrar sessões de treino por data.
+- Manter histórico dos exercícios registrados no navegador.
+- Acompanhar evolução da carga em `kg` para musculação e do tempo em `min` para cardio.
+- Consultar estatísticas e gráficos construídos com Recharts.
+- Visualizar os dados resumidos no Dashboard.
 
----
+### Experiência de uso
 
-## React
+- Feedback visual de carregamento, sucesso, erro e listas vazias nos fluxos integrados.
+- Interface responsiva, com reorganização de elementos para diferentes larguras de tela.
 
-O React é utilizado na construção da interface e na organização da aplicação através de componentes reutilizáveis.
+## 4. Tecnologias utilizadas
 
-O projeto utiliza recursos como:
+| Área | Tecnologia | Finalidade |
+| --- | --- | --- |
+| Frontend | React | Construção da interface em componentes |
+| Tipagem | TypeScript | Definição de tipos e interfaces |
+| Ferramenta de desenvolvimento | Vite | Execução, proxy da API externa e build |
+| Navegação | React Router DOM | Controle das rotas da aplicação |
+| Ícones | Lucide React | Ícones da interface |
+| Gráficos | Recharts | Representação da evolução |
+| Estilização | CSS | Layout e responsividade |
+| Backend | Node.js + Fastify | API REST própria |
+| CORS | `@fastify/cors` | Comunicação do navegador com a API |
+| Requisições | `fetch`, `async/await`, HTTP e JSON | Comunicação assíncrona |
+| Armazenamento | Memória do Fastify e `localStorage` | Fichas no servidor; login e histórico no navegador |
+| Catálogo externo | wger Workout Manager | Dados e traduções de exercícios |
 
-- Componentes
-- Props
-- useState
-- useEffect
-- Eventos
-- Renderização condicional
-- map
-- filter
-- Manipulação de arrays e objetos
+## 5. Organização com React
 
----
+O React é responsável pela interface da aplicação. O projeto utiliza **componentes reutilizáveis**, permitindo separar elementos comuns das páginas e evitar repetição de código.
 
-## TypeScript
+Os principais recursos empregados são:
 
-O TypeScript é utilizado para adicionar tipagem ao projeto.
+- **Componentes e props:** reaproveitamento de elementos e envio de informações entre eles.
+- **`useState`:** controle de fichas, campos de formulário, seleção de exercícios e mensagens na interface.
+- **`useEffect`:** carregamento de dados em momentos específicos, como a abertura do Dashboard e da página de fichas.
+- **Eventos:** ações de clique, edição de campos e envio de dados.
+- **Renderização condicional:** exibição de conteúdo de acordo com o estado da interface.
+- **`map`:** criação de listas visuais com base em arrays de fichas e exercícios.
+- **`filter`:** aplicação de filtros e remoção de itens de listas.
+- **Manipulação de arrays e objetos:** atualização das informações no estado da aplicação.
 
-Foram criadas interfaces para representar informações como:
+### Componentes reutilizáveis
 
-- Exercícios
-- Traduções dos exercícios
-- Treinos
-- Exercícios adicionados aos treinos
-- Tipos de exercícios
-- Registros de progresso
-- Respostas da API
+- **`AppLayout`:** organiza as páginas internas, a navegação, o menu lateral e a barra superior.
+- **`ProtectedRoute`:** restringe as páginas internas a quem concluiu o login simulado.
+- **`StatCard`:** mostra estatísticas no Dashboard; recebe os valores e ícones por **props**.
 
-Isso ajuda na organização do código e reduz erros durante o desenvolvimento.
+## 6. TypeScript e organização dos tipos
 
----
+O TypeScript adiciona tipagem ao projeto para ajudar na organização dos dados e na identificação de inconsistências durante o desenvolvimento.
 
-## React Router
+As interfaces representam informações como:
 
-O projeto utiliza o **React Router DOM** para controlar a navegação entre as páginas.
+- Exercícios do catálogo e suas traduções.
+- Categorias e equipamentos.
+- Fichas de treino e exercícios incluídos em cada ficha.
+- Tipos de exercício (`musculacao` e `cardio`).
+- Registros e histórico de progresso.
+- Informações esperadas nas respostas das APIs.
 
-Entre as principais rotas estão:
+Os tipos são organizados na pasta `src/types/`, incluindo os arquivos `Exercise.ts`, `Workout.ts` e `Progress.ts`.
+
+## 7. Navegação e rotas protegidas
+
+O **React Router DOM** controla a transição entre as páginas sem exigir o recarregamento completo da aplicação.
+
+| Rota | Página | Função |
+| --- | --- | --- |
+| `/login` | Login | Entrada de demonstração |
+| `/dashboard` | Dashboard | Indicadores e visão geral |
+| `/exercicios` | Exercícios | Catálogo, busca e filtros |
+| `/exercicios/:id` | Detalhes | Consultar e configurar um exercício |
+| `/treinos` | Minhas fichas | Criar, editar, excluir e registrar treinos |
+| `/progresso` | Progresso | Histórico e gráficos |
+| Demais endereços | 404 | Informar rota inexistente |
+
+As rotas internas são protegidas pelo componente `ProtectedRoute`. Quando um usuário não autenticado tenta acessá-las, ele é redirecionado ao login. A página 404 apresenta uma mensagem de página não encontrada e opções para retornar à navegação.
+
+### Login de demonstração
 
 ```text
-/login
-/dashboard
-/exercicios
-/exercicios/:id
-/treinos
-/progresso
+E-mail: usuario@progressio.com
+Senha:  123456
 ```
 
-Também existe tratamento para rotas inexistentes através da página **404**.
+O login é **mockado**: não existe um cadastro real de usuários, verificação por servidor ou emissão de JWT. O estado da autenticação é armazenado no `localStorage` do navegador e pode ser encerrado pelo logout.
 
----
+## 8. Dashboard
 
-## Rotas protegidas
+O Dashboard é a visão geral da aplicação. Ele reúne indicadores para que o usuário encontre rapidamente informações importantes sobre seus treinos e sua evolução.
 
-As páginas internas do sistema são protegidas por autenticação.
+Entre os dados apresentados estão:
 
-Caso um usuário tente acessar uma página interna sem estar autenticado, ele é redirecionado para a página de login.
+- Quantidade de fichas de treino.
+- Quantidade de exercícios presentes nas fichas.
+- Número de sessões registradas.
+- Quantidade de exercícios com evolução positiva.
+- Treino em destaque ou último treino registrado.
+- Evoluções recentes.
 
-Após realizar o login corretamente, o usuário pode acessar as funcionalidades do sistema.
+Para os exercícios de musculação, o Dashboard mostra valores como séries, repetições e carga. Para cardio, apresenta o tempo em minutos. As fichas e exercícios são consultados da API própria **Fastify**; os indicadores de histórico e evolução utilizam os registros mantidos no navegador nesta etapa.
 
----
+## 9. Catálogo de exercícios e API externa
 
-## Login de demonstração
+O Progressio utiliza a API pública **wger Workout Manager** como fonte complementar de dados de exercícios.
 
-Para acessar o sistema utilize:
+O catálogo permite visualizar, pesquisar por nome e filtrar exercícios por categoria. A pesquisa considera os nomes nos idiomas disponíveis. Quando a API oferece os dados, os cards e a página de detalhes apresentam:
 
-### E-mail
+- Nome em português e inglês.
+- Descrição em português e inglês.
+- Categoria do exercício.
+- Equipamentos utilizados.
 
-```text
-usuario@progressio.com
-```
+O frontend consulta essa API por meio de `fetch`, `async/await` e `useEffect`. Durante o desenvolvimento, o **Vite** pode encaminhar as chamadas da wger usando o proxy configurado em `vite.config.ts`.
 
-### Senha
+O acesso depende de conexão com a internet e da disponibilidade da API. Nem todos os exercícios possuem traduções completas, e a interface trata a ausência desses dados quando necessário.
 
-```text
-123456
-```
+## 10. Detalhes e configuração dos exercícios
 
-O login é apenas uma simulação para esta etapa do projeto.
+Ao clicar em um item do catálogo, o usuário acessa sua página de detalhes para conferir as informações e selecionar a ficha em que deseja adicioná-lo.
 
-A autenticação é armazenada através do **LocalStorage** do navegador.
+### Exercícios de musculação
 
----
+O usuário escolhe a ficha e configura:
 
-## Dashboard
+- Quantidade de séries.
+- Quantidade de repetições.
+- Carga em quilogramas.
 
-O Dashboard apresenta uma visão geral das informações do usuário.
-
-Entre as informações exibidas estão:
-
-- Quantidade de fichas de treino
-- Quantidade de exercícios cadastrados nas fichas
-- Quantidade de treinos registrados
-- Quantidade de exercícios com evolução
-- Último treino registrado
-- Evoluções recentes
-
-O Dashboard também identifica o tipo do exercício.
-
-Para musculação, são apresentados dados de séries, repetições e carga.
-
-Para cardio, é apresentado o tempo em minutos.
-
-As evoluções recentes também utilizam a unidade adequada:
+Exemplo ilustrativo:
 
 ```text
-Musculação → kg
-Cardio → min
-```
-
----
-
-## Catálogo de exercícios
-
-A página de exercícios apresenta uma lista de exercícios obtidos através de uma API externa.
-
-O usuário pode:
-
-- Visualizar os exercícios
-- Pesquisar pelo nome
-- Pesquisar utilizando português ou inglês
-- Filtrar pela categoria
-- Visualizar informações do exercício
-- Acessar a página de detalhes
-
-Quando disponíveis na API, os cards apresentam o nome do exercício em:
-
-```text
-Português
-English
-```
-
-A listagem utiliza recursos como:
-
-- map
-- filter
-- key
-- useState
-- useEffect
-
----
-
-## API externa
-
-O Progressio utiliza a API pública do **wger Workout Manager** para carregar informações relacionadas aos exercícios.
-
-A aplicação utiliza as traduções disponíveis na própria API para apresentar os exercícios em **português e inglês**.
-
-Quando disponíveis, são exibidos:
-
-- Nome em português
-- Nome em inglês
-- Descrição em português
-- Descrição em inglês
-- Categoria
-- Equipamentos
-
-A busca de exercícios também considera os nomes disponíveis nos dois idiomas.
-
-O consumo da API é realizado utilizando:
-
-```text
-fetch
-async/await
-useEffect
-```
-
-Também foram implementados estados para:
-
-- Carregamento
-- Sucesso
-- Erro
-
-Caso ocorra algum problema na comunicação com a API, o sistema apresenta uma mensagem ao usuário e permite tentar novamente.
-
-Durante o desenvolvimento, o Vite é utilizado como proxy para realizar a comunicação com a API.
-
----
-
-## Detalhes do exercício
-
-Ao selecionar um exercício, o usuário pode acessar uma página específica com suas informações.
-
-Quando disponíveis na API, são apresentados:
-
-- Nome em português
-- Nome em inglês
-- Descrição em português
-- Descrição em inglês
-- Categoria
-- Equipamento
-- Tipo do exercício
-
-O sistema diferencia exercícios de **musculação** e **cardio**.
-
-### Musculação
-
-Para exercícios de musculação, o usuário configura:
-
-- Ficha de destino
-- Séries
-- Repetições
-- Carga em quilogramas
-
-Exemplo:
-
-```text
+Exercício: Supino reto
 Séries: 4
 Repetições: 10
 Carga: 30 kg
 ```
 
-### Cardio
+### Exercícios de cardio
 
-Para exercícios de cardio, o usuário configura:
+O usuário seleciona a ficha e informa a duração em minutos. Para cardio, o formulário não exige séries, repetições ou carga.
 
-- Ficha de destino
-- Tempo em minutos
-
-Exemplo:
+Exemplo ilustrativo:
 
 ```text
+Exercício: Cycling
 Tempo: 30 min
 ```
 
-Nos exercícios de cardio não são solicitadas séries, repetições ou carga.
+Após a configuração, o exercício é incluído na ficha selecionada por uma requisição à API Fastify.
 
-Depois da configuração, o exercício pode ser adicionado à ficha escolhida.
+## 11. Fichas de treino
 
----
+O usuário pode criar fichas diferentes, como **Treino A**, **Treino B** e **Treino C**. Cada uma contém sua própria lista de exercícios e configurações.
 
-## Fichas de treino
+Na página **Minhas fichas**, o usuário pode selecionar uma ficha, alterar seu nome, excluir uma ficha permitida, remover exercícios e modificar os valores de séries, repetições, cargas ou tempo. Também são apresentados o total de exercícios, o total de séries de musculação e o tempo total de cardio.
 
-O sistema permite criar múltiplas fichas de treino.
+A versão atual utiliza o **Fastify como fonte dos dados das fichas**, evitando depender apenas do armazenamento local para o CRUD principal.
 
-Por exemplo:
+## 12. Registro das sessões de treino
 
-```text
-Treino A
-Treino B
-Treino C
-```
+Depois de configurar uma ficha, o usuário pode registrar a realização do treino indicando uma data.
 
-Cada ficha possui seus próprios exercícios.
+Nos exercícios de **musculação**, o registro contém informações como exercício, data, carga, séries, repetições, ficha e tipo. Nos exercícios de **cardio**, guarda exercício, data, duração, ficha e tipo.
 
-O usuário pode:
+Esses registros são utilizados posteriormente para mostrar o histórico e calcular a evolução. Nesta etapa, o histórico das sessões continua armazenado no **`localStorage`** do navegador.
 
-- Criar uma nova ficha
-- Selecionar uma ficha
-- Renomear uma ficha
-- Excluir uma ficha
-- Adicionar exercícios
-- Remover exercícios
-- Alterar séries
-- Alterar repetições
-- Alterar cargas
-- Alterar o tempo dos exercícios de cardio
+## 13. Progresso e gráficos
 
-O sistema mantém pelo menos uma ficha de treino cadastrada.
+A página **Progresso** permite selecionar um exercício e consultar seus registros, indicadores e gráficos ao longo do tempo. Os gráficos utilizam a biblioteca **Recharts**.
 
-Na tela de treinos, os exercícios são exibidos de acordo com seu tipo.
+### Evolução na musculação
 
-### Exemplo de musculação
+O sistema pode apresentar:
 
-```text
-Supino reto
+- Primeira carga registrada.
+- Carga atual e maior carga.
+- Diferença entre carga inicial e atual.
+- Quantidade de registros.
+- Séries e repetições.
+- Histórico e gráfico em quilogramas.
 
-4 séries
-10 repetições
-30 kg
-```
-
-### Exemplo de cardio
-
-```text
-Cycling
-
-30 min
-```
-
-O resumo da ficha também apresenta o total de séries dos exercícios de musculação e o tempo de cardio cadastrado.
-
----
-
-## Registro de treino
-
-Depois de configurar uma ficha, o usuário pode registrar o treino realizado.
-
-Nos exercícios de musculação são armazenadas informações como:
-
-- Exercício
-- Data
-- Carga
-- Séries
-- Repetições
-- Ficha de treino
-- Tipo do exercício
-
-Nos exercícios de cardio são armazenadas informações como:
-
-- Exercício
-- Data
-- Tempo em minutos
-- Ficha de treino
-- Tipo do exercício
-
-Essas informações são utilizadas posteriormente para calcular e apresentar a evolução do usuário.
-
----
-
-## Progresso
-
-A página de progresso permite acompanhar a evolução dos exercícios registrados.
-
-O usuário pode selecionar um exercício e consultar seus registros.
-
-O comportamento da página depende do tipo do exercício.
-
-### Musculação
-
-Para exercícios de musculação, o sistema apresenta:
-
-- Carga inicial
-- Carga atual
-- Maior carga registrada
-- Evolução total da carga
-- Quantidade de registros
-- Séries
-- Repetições
-- Histórico de cargas
-- Gráfico de evolução em quilogramas
-
-Exemplo:
+Exemplo ilustrativo:
 
 ```text
 Primeira carga: 20 kg
 Carga atual: 30 kg
-Evolução: +10 kg
 Maior carga: 30 kg
+Evolução total: +10 kg
 ```
 
-### Cardio
+### Evolução no cardio
 
-Para exercícios de cardio, o sistema apresenta:
+O sistema pode apresentar:
 
-- Tempo inicial
-- Tempo atual
-- Maior tempo registrado
-- Evolução total do tempo
-- Quantidade de registros
-- Histórico dos tempos
-- Gráfico de evolução em minutos
+- Primeiro tempo registrado.
+- Tempo atual e maior duração.
+- Diferença entre o primeiro e o último registro.
+- Quantidade de registros.
+- Histórico e gráfico em minutos.
 
-Exemplo:
+Exemplo ilustrativo:
 
 ```text
 Primeiro tempo: 20 min
 Tempo atual: 30 min
-Evolução: +10 min
 Maior tempo: 30 min
+Evolução total: +10 min
 ```
 
-O gráfico foi desenvolvido utilizando a biblioteca **Recharts**.
+## 14. API própria em Fastify — CRUD em memória
 
----
+A entidade principal do backend é a **ficha de treino**. Um registro possui `id`, `nome`, `criadoEm` e uma lista de `exercicios`, que podem conter `id`, `nome`, `categoria`, `equipamento`, `tipo`, `series`, `repeticoes`, `carga` e `tempoMinutos`.
 
-## Armazenamento de dados
+### Rotas disponíveis
 
-Nesta etapa do projeto ainda não existe um backend próprio.
+| Método HTTP | Endpoint | O que faz | Status esperado |
+| --- | --- | --- | --- |
+| `GET` | `/health` | Confirma que o servidor está ativo | `200` |
+| `GET` | `/treinos` | Lista todas as fichas | `200` |
+| `GET` | `/treinos/:id` | Consulta uma ficha pelo ID | `200` ou `404` |
+| `POST` | `/treinos` | Cadastra uma ficha | `201` ou `400` |
+| `PUT` | `/treinos/:id` | Altera nome e exercícios | `200`, `400` ou `404` |
+| `DELETE` | `/treinos/:id` | Exclui uma ficha | `204`, `400` ou `404` |
 
-Os dados criados pelo usuário são armazenados utilizando o **LocalStorage** do navegador.
+### Exemplo de cadastro
 
-São armazenadas informações relacionadas a:
+Corpo JSON de uma requisição `POST /treinos`:
 
-- Autenticação
-- Fichas de treino
-- Exercícios das fichas
-- Tipo dos exercícios
-- Séries
-- Repetições
-- Cargas
-- Tempos de cardio
-- Histórico de treinos
-- Histórico de progresso
+```json
+{
+  "nome": "Treino B - Costas",
+  "exercicios": []
+}
+```
 
-Isso permite que os dados continuem disponíveis mesmo após atualizar a página.
+O Fastify recebe os dados pelo `request.body` nas operações de criação e atualização. Nas rotas que trabalham com uma ficha específica, o identificador é recebido em `request.params.id`.
 
-Como o armazenamento é local, os dados pertencem ao navegador e ao dispositivo onde foram criados.
+O backend realiza validações básicas e devolve respostas HTTP coerentes. Um cadastro bem-sucedido retorna **`201 Created`**, uma tentativa de consultar um recurso inexistente retorna **`404 Not Found`**, dados inválidos podem retornar **`400 Bad Request`** e uma exclusão realizada retorna **`204 No Content`**.
 
-Por exemplo, os dados cadastrados no navegador do computador não aparecem automaticamente no celular.
+### Organização do backend
 
-Uma futura integração com backend e banco de dados permitirá sincronizar as informações entre diferentes dispositivos.
+- `backend/src/server.ts`: inicia o Fastify, habilita o logger, configura CORS e define a rota `/health`.
+- `backend/src/data/treinos.ts`: define os tipos e mantém o array de fichas em memória.
+- `backend/src/routes/treinos.ts`: organiza as rotas GET, POST, PUT e DELETE.
 
----
+**Não existe banco de dados nesta N1.** As fichas criadas ou modificadas ficam na memória do processo Fastify. Ao reiniciar o backend, as alterações são perdidas e os dados iniciais reaparecem. Essa característica está de acordo com os requisitos da avaliação.
 
-## Organização do projeto
+## 15. Comunicação React → HTTP → Fastify
 
-O projeto foi organizado utilizando diferentes pastas para separar as responsabilidades da aplicação.
+O fluxo de uma ação, como criar ou atualizar uma ficha, ocorre da seguinte forma:
+
+1. O usuário clica em um botão ou preenche um formulário no React.
+2. Um evento chama uma função assíncrona do serviço `src/services/treinosApi.ts`.
+3. O serviço usa `fetch` e `async/await` para enviar uma requisição HTTP ao Fastify.
+4. O servidor lê os dados, valida a requisição e consulta ou altera o array de fichas.
+5. O backend retorna um status HTTP e, quando aplicável, uma resposta em **JSON**.
+6. O frontend verifica `response.ok`, atualiza os estados com `useState` e apresenta sucesso ou erro.
+7. O `useEffect` realiza consultas em páginas como Dashboard e Minhas fichas quando elas são carregadas.
+
+Os estados de **loading**, erro e ausência de dados são tratados visualmente nos fluxos integrados. O método, URL, corpo (`body`), parâmetros (`params`), resposta e status podem ser observados pelo painel **Network** do navegador.
+
+## 16. Armazenamento dos dados
+
+A versão atual utiliza duas formas distintas de armazenamento:
+
+| Informação | Armazenamento | Persistência |
+| --- | --- | --- |
+| Fichas e exercícios associados | Array em memória no Fastify | Mantidos durante a execução do backend |
+| Estado do login simulado | `localStorage` | Mantido no navegador até sair ou limpar os dados |
+| Sessões registradas e histórico de evolução | `localStorage` | Mantidos no navegador utilizado |
+| Catálogo de exercícios | API pública wger | Consultado externamente |
+
+Assim, o histórico de um navegador não aparece automaticamente em outro dispositivo. Também é possível que o histórico local continue existindo depois que o backend for reiniciado e suas fichas voltarem ao estado inicial.
+
+O arquivo `workoutStorage.ts` continua responsável por funções ligadas aos registros locais. O CRUD das fichas na N1 utiliza `treinosApi.ts` e a API Fastify. Em versões futuras, a persistência em banco de dados poderá permitir armazenamento duradouro e sincronização entre dispositivos.
+
+## 17. Estrutura principal do projeto
 
 ```text
 progressio/
-│
+├── backend/
+│   ├── src/
+│   │   ├── data/
+│   │   │   └── treinos.ts
+│   │   ├── routes/
+│   │   │   └── treinos.ts
+│   │   └── server.ts
+│   └── package.json
 ├── public/
-│
 ├── src/
-│   │
 │   ├── components/
 │   │   ├── AppLayout.tsx
 │   │   ├── ProtectedRoute.tsx
 │   │   └── StatCard.tsx
-│   │
 │   ├── data/
-│   │
 │   ├── pages/
 │   │   ├── Login.tsx
 │   │   ├── Dashboard.tsx
@@ -500,21 +364,18 @@ progressio/
 │   │   ├── Workouts.tsx
 │   │   ├── Progress.tsx
 │   │   └── NotFound.tsx
-│   │
 │   ├── services/
 │   │   ├── authStorage.ts
 │   │   ├── exerciseApi.ts
+│   │   ├── treinosApi.ts
 │   │   └── workoutStorage.ts
-│   │
 │   ├── types/
 │   │   ├── Exercise.ts
 │   │   ├── Workout.ts
 │   │   └── Progress.ts
-│   │
 │   ├── App.tsx
 │   ├── index.css
 │   └── main.tsx
-│
 ├── index.html
 ├── package.json
 ├── tsconfig.json
@@ -522,210 +383,164 @@ progressio/
 └── README.md
 ```
 
----
+Essa estrutura separa responsabilidades: componentes compartilhados, páginas, serviços responsáveis pela comunicação, tipos TypeScript, dados e rotas do backend.
 
-## Componentes
-
-O projeto utiliza componentes para evitar repetição de código e melhorar a organização.
-
-Um exemplo é o componente:
+## 18. Fluxo principal do sistema
 
 ```text
-StatCard
-```
-
-Ele é utilizado no Dashboard para apresentar diferentes estatísticas através de **props**.
-
-Também existe o componente:
-
-```text
-AppLayout
-```
-
-responsável pela estrutura principal das páginas internas, incluindo menu lateral e barra superior.
-
-O componente:
-
-```text
-ProtectedRoute
-```
-
-é responsável por impedir o acesso às páginas internas caso o usuário não esteja autenticado.
-
----
-
-## Fluxo principal do sistema
-
-O fluxo principal da aplicação é:
-
-```text
-Login
-  ↓
+Login de demonstração
+         ↓
 Dashboard
-  ↓
-Exercícios
-  ↓
+         ↓
+Catálogo de exercícios
+         ↓
 Detalhes do exercício
-  ↓
-Adicionar à ficha
-  ↓
-Meus Treinos
-  ↓
-Registrar treino
-  ↓
-Progresso
+         ↓
+Selecionar uma ficha
+         ↓
+Configurar séries / carga / tempo
+         ↓
+Adicionar exercício pela API Fastify
+         ↓
+Minhas fichas — editar e salvar
+         ↓
+Registrar sessão por data
+         ↓
+Histórico e gráficos de progresso
 ```
 
----
+## 19. Responsividade e identidade visual
 
-## Responsividade
+O Progressio foi desenvolvido com **CSS, Grid, Flexbox e media queries** para reorganizar elementos conforme a largura da tela. Menus, cards, listas, formulários e gráficos são adaptados para uso em desktop e telas menores.
 
-A interface foi desenvolvida para se adaptar a diferentes tamanhos de tela.
+A interface usa predominantemente **azul-céu, branco e cinza-claro**, priorizando legibilidade e consistência visual. A responsividade pode ser demonstrada no Chrome DevTools com a ferramenta de visualização de dispositivos, testando uma largura de celular, como **375 px**, e uma largura de desktop.
 
-Foram utilizados recursos de CSS como:
+### Acesso pela rede local
 
-- Grid
-- Flexbox
-- Media Queries
-
-Em telas menores, elementos como menu lateral, cards, formulários, listas, botões e gráficos são reorganizados para melhorar a experiência do usuário.
-
-O projeto também pode ser acessado através de outros dispositivos conectados à rede utilizada durante o desenvolvimento, desde que o servidor Vite esteja configurado para aceitar conexões pela rede.
-
----
-
-## Identidade visual
-
-O Progressio utiliza principalmente as cores:
-
-- Azul céu
-- Branco
-- Tons claros de cinza
-
-A proposta visual é apresentar uma interface simples, moderna e organizada.
-
----
-
-## Como instalar o projeto
-
-É necessário possuir o **Node.js** instalado no computador.
-
-Depois de baixar ou clonar o projeto, abra o terminal dentro da pasta do projeto.
-
-Entre na pasta:
-
-```bash
-cd progressio
-```
-
-Instale todas as dependências:
-
-```bash
-npm install
-```
-
----
-
-## Como executar o projeto
-
-Depois de instalar as dependências, execute:
-
-```bash
-npm run dev
-```
-
-O Vite iniciará o servidor de desenvolvimento.
-
-No terminal será exibido um endereço semelhante a:
-
-```text
-http://localhost:5173/
-```
-
-Abra esse endereço no navegador.
-
----
-
-## Executar na rede local
-
-Para permitir acesso através de outro dispositivo conectado à mesma rede, o Vite pode ser iniciado com:
+Para disponibilizar o Vite na rede local durante o desenvolvimento:
 
 ```bash
 npm run dev -- --host 0.0.0.0
 ```
 
-O terminal exibirá um endereço de rede semelhante a:
+O terminal poderá mostrar um endereço semelhante a `http://192.168.x.x:5173/`. Para que **o CRUD funcione em outro dispositivo**, além do frontend, o endereço configurado para a API precisa apontar para o computador que executa o Fastify. `localhost:3333` no celular refere-se ao próprio celular.
 
-```text
-Network: http://192.168.x.x:5173/
+## 20. Instalação e execução
+
+### Pré-requisitos
+
+- Node.js e npm instalados.
+- Acesso à internet para consultar a API pública wger.
+- Dois terminais, um para o backend e outro para o frontend.
+
+Abra a pasta principal `progressio` no VS Code.
+
+### Terminal 1 — Backend
+
+No terminal aberto na raiz do projeto:
+
+```bash
+cd backend
+npm install
+npm run dev
 ```
 
-Esse endereço pode ser utilizado por outro dispositivo que consiga se comunicar com o computador através da rede local.
+A API deverá iniciar em **http://localhost:3333**. Para confirmar o funcionamento, consulte:
 
----
+- `http://localhost:3333/health`
+- `http://localhost:3333/treinos`
 
-## Dependências principais
+### Terminal 2 — Frontend
 
-Entre as principais dependências utilizadas estão:
-
-```text
-react
-react-dom
-react-router-dom
-lucide-react
-recharts
-```
-
-As dependências são instaladas automaticamente através do comando:
+Abra um **segundo terminal na pasta principal `progressio`**, fora de `backend`:
 
 ```bash
 npm install
+npm run dev
 ```
 
----
+Abra o endereço exibido pelo Vite, normalmente **http://localhost:5173**.
 
-## Build do projeto
+**Os dois servidores precisam estar rodando ao mesmo tempo.** A aplicação React se conecta ao Fastify em `http://localhost:3333`.
 
-Para gerar uma versão de produção do projeto utilize:
+### Configuração de CORS
+
+O Fastify usa `@fastify/cors`. Nesta versão local de desenvolvimento, foi usada a opção `origin: true` para permitir a comunicação durante os testes. Essa opção é permissiva e **deve ser substituída por origens autorizadas antes de publicar a API**.
+
+## 21. Compilação e verificações
+
+### Frontend
+
+Na pasta principal do Progressio:
 
 ```bash
 npm run build
 ```
 
-Esse comando realiza a compilação do projeto e gera os arquivos de produção.
+Esse comando verifica os tipos e compila o frontend com Vite. No teste realizado para a N1, o comando terminou com sucesso. O Vite apresentou um **aviso** de bundle JavaScript maior que 500 kB, que não impede a compilação.
 
----
+### Backend
 
-## Página 404
+Na pasta `backend`:
 
-O projeto possui uma página personalizada para endereços inexistentes.
-
-Caso o usuário acesse uma rota que não existe, será exibida uma página informando:
-
-```text
-ERRO 404
-
-Página não encontrada
+```bash
+npx tsc --noEmit
 ```
 
-O usuário poderá retornar ao sistema através dos botões disponíveis na página.
+O comando é utilizado para verificar o TypeScript sem gerar arquivos. O backend também deve permanecer executando normalmente pelo comando `npm run dev`.
 
----
+## 22. Performance — evidências da N1
 
-## Integrante
+A performance do Progressio será avaliada pelo painel **Chrome DevTools → Network → Fetch/XHR → Timing**, observando requisições à API Fastify, como **GET `/treinos`**.
 
-**Thainara de Fátima Jacob Vieira**
+### Primeira medição
 
----
+| Informação | Resultado |
+| --- | --- |
+| Requisição | **[GET /treinos]** |
+| Status HTTP| **[200 OK]** |
+| Iniciador | **[treinosApi.ts:26]** |
+| Tempo total | **[3,34 ms]** |
+| Tamanho da resposta | **[1,1 kb]** |
 
-## Disciplina
+### Detalhamento da primeira medição
+- Queueing: 0,64 ms
+- Stalled: 0,68 ms
+- Request sent: 0,19 ms
+- Waiting for server response: 1,39 ms
+- Content download: 0,45 ms
 
-**Programação para Sistemas Web**
+![Resposta 1](images/resposta-1.png)
 
-Período: **2026.2**
+![Primeira medição de performance](images/medicao-1.png)
 
----
+### Segunda medição
 
-## Projeto
+| Informação | Resultado |
+| --- | --- |
+| Requisição | **[GET /treinos]** |
+| Status HTTP| **[200 OK]** |
+| Iniciador | **[treinosApi.ts:26]** |
+| Tempo total | **[4,67 ms]** |
+| Tamanho da resposta | **[1,1 kb]** |
 
-**Progressio — Sistema de gerenciamento de treinos e acompanhamento de evolução**
+### Detalhamento da segunda medição
+- Queueing: 0,61 ms
+- Stalled: 0,56 ms
+- DNS lookup: 17 µs
+- Initial connection: 0,89 ms
+- Request sent: 0,18 ms
+- Waiting for server response: 1,72 ms
+- Content download: 0,60 ms
+
+**Espaço para o print da segunda medição:**
+
+![Resposta 2](images/resposta-2.png)
+
+![Segunda medição de performance](images/medicao-2.png)
+
+### Análise técnica dos resultados 
+
+Nas duas medições realizadas, a requisição GET /treinos apresentou tempos de resposta baixos, com 3,34 ms na primeira consulta e 4,67 ms na segunda. Em ambos os casos, a API retornou status 200 OK e resposta com aproximadamente 1,1 kB.
+O maior tempo observado ocorreu na etapa Waiting for server response, com 1,39 ms na primeira medição e 1,72 ms na segunda, representando o tempo de processamento e resposta do servidor. Mesmo assim, os valores continuaram baixos e adequados para o cenário local testado.
+Com base nesses resultados, não foi identificado gargalo relevante nessa operação. Por esse motivo, não foi necessária uma otimização específica para a rota GET /treinos nesta etapa. Em um cenário com maior volume de dados, seria importante repetir os testes e avaliar possíveis melhorias, como paginação ou redução da quantidade de dados retornados.
